@@ -105,8 +105,9 @@ task-manager/
 │   └── README.md                   # Frontend project documentation
 └── README.md                       # Main project documentation
 
+```
 
-Installation
+# Installation
 Prerequisites
 Node.js (v14 or higher)
 
@@ -117,12 +118,12 @@ MySQL/PostgreSQL database
 Backend Setup
 Navigate to the backend folder:
 
-bash
-Copy
-Edit
-cd backend
-Install dependencies:
+```bash
 
+cd backend
+```
+
+Install dependencies:
 
 ```bash
 npm install
