@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "npx ts-node-dev --respawn --transpile-only server.ts",
     "build": "tsc",
-    "start": "node dist/server.js",
+    "start": "npm start",
     "seed": "npx ts-node seeders/seed.ts",
     "test": "jest"
   },
