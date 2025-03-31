@@ -8,7 +8,7 @@
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "types": ["node", "jest"]
+    "types": ["node"]
   },
   "include": ["server.ts", "models/**/*", "resolvers.ts, tests/**/*"],
   "exclude": ["node_modules"]
