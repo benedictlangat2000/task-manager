@@ -1,6 +1,5 @@
 import { setupTestDB, sequelize } from "./sequelizeTestSetup";
 import { UserModel } from "../models/User";
-import '@types/jest';
 
 beforeAll(async () => {
   await setupTestDB();
