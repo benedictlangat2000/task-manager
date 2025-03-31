@@ -6,6 +6,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
+// GraphQL mutation for signing up
 const SIGN_UP = gql`
   mutation SignUp($name: String!, $email: String!, $password: String!) {
     signUp(name: $name, email: $email, password: $password) {
@@ -16,6 +17,10 @@ const SIGN_UP = gql`
   }
 `;
 
+/**
+ * SignUp component for user registration.
+ * @returns {JSX.Element} The rendered SignUp component.
+ */
 export default function SignUp() {
   const { register, handleSubmit, formState: { errors } } = useForm();
   const [serverError, setServerError] = useState<string | null>(null);
@@ -23,6 +28,7 @@ export default function SignUp() {
   const [signUp] = useMutation(SIGN_UP);
   const router = useRouter();
 
+  // Redirect to login page after successful signup
   useEffect(() => {
     if (signupSuccess) {
       const timer = setTimeout(() => {
@@ -32,9 +38,17 @@ export default function SignUp() {
     }
   }, [signupSuccess, router]);
 
+  /**
+   * Handles form submission for signup.
+   * @param {Object} formData - The form data containing name, email, and password.
+   * @param {string} formData.name - The name of the user.
+   * @param {string} formData.email - The email of the user.
+   * @param {string} formData.password - The password of the user.
+   * @returns {Promise<void>} A promise that resolves when the signup process is complete.
+   */
   const onSubmit = async (formData: any) => {
     try {
-      setServerError(null);
+      setServerError(null); // Reset server error state
       const { data } = await signUp({ variables: formData });
       
       if (data?.signUp) {
@@ -69,7 +83,7 @@ export default function SignUp() {
               <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
               <input
                 {...register('name', { required: true })}
-                placeholder="John Doe"
+                placeholder="enter name"
                 className={`w-full px-4 py-2 border rounded-lg focus:outline-none ${
                   errors.name ? 'border-red-500' : 'border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200'
                 }`}
@@ -92,7 +106,7 @@ export default function SignUp() {
                 type="email"
                 placeholder="john@example.com"
                 className={`w-full px-4 py-2 border rounded-lg focus:outline-none ${
-                  errors.email ? 'border-red-500' : 'border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200'
+                  errors.email ? 'border-red-500' : 'border-gray-300 focus:border-blue- 500 focus:ring-2 focus:ring-blue-200'
                 }`}
               />
               {errors.email && (

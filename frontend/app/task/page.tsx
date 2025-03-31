@@ -1,9 +1,11 @@
+// frontend/app/taskManagement/page.tsx
 'use client';
 import { useForm } from 'react-hook-form';
 import { gql, useMutation, useQuery } from '@apollo/client';
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 
+// GraphQL query to get tasks
 const GET_TASKS = gql`
   query GetTasks {
     tasks {
@@ -15,6 +17,7 @@ const GET_TASKS = gql`
   }
 `;
 
+// GraphQL mutation to create a task
 const CREATE_TASK = gql`
   mutation CreateTask($title: String!, $description: String!, $status: String!) {
     createTask(title: $title, description: $description, status: $status) {
@@ -26,6 +29,7 @@ const CREATE_TASK = gql`
   }
 `;
 
+// GraphQL mutation to update a task
 const UPDATE_TASK = gql`
   mutation UpdateTask($id: ID!, $title: String!, $description: String!, $status: String!) {
     updateTask(id: $id, title: $title, description: $description, status: $status) {
@@ -37,12 +41,17 @@ const UPDATE_TASK = gql`
   }
 `;
 
+// GraphQL mutation to delete a task
 const DELETE_TASK = gql`
   mutation DeleteTask($id: ID!) {
     deleteTask(id: $id)  # No subfields since it returns a Boolean
   }
 `;
 
+/**
+ * TaskManagement component for managing tasks (create, update, delete).
+ * @returns {JSX.Element} The rendered TaskManagement component.
+ */
 export default function TaskManagement() {
   const { register, handleSubmit, reset } = useForm();
   const { data, loading, error, refetch } = useQuery(GET_TASKS);
@@ -64,6 +73,14 @@ export default function TaskManagement() {
     }
   }, [message, errorMessage]);
 
+  /**
+   * Handles form submission for creating or updating a task.
+   * @param {Object} formData - The form data containing title, description, and status.
+   * @param {string} formData.title - The title of the task.
+   * @param {string} formData.description - The description of the task.
+   * @param {string} formData.status - The status of the task.
+   * @returns {Promise<void>} A promise that resolves when the task is created or updated.
+   */
   const onSubmit = async (formData: any) => {
     try {
       if (editingTask) {
@@ -82,11 +99,20 @@ export default function TaskManagement() {
     }
   };
 
+  /**
+   * Prepares the task for editing by setting it to the editing state and resetting the form.
+   * @param {Object} task - The task object to edit.
+   */
   const handleEdit = (task: any) => {
     setEditingTask(task);
     reset(task);
   };
 
+  /**
+   * Handles the deletion of a task.
+   * @param {number} id - The ID of the task to delete.
+   * @returns {Promise<void>} A promise that resolves when the task is deleted.
+   */
   const handleDelete = async (id: number) => {
     try {
       const { data } = await deleteTask({ variables: { id: id.toString() } });
@@ -147,7 +173,7 @@ export default function TaskManagement() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+            <label className="block text-sm font-medium text-gray-700 mb- 1">Status</label>
             <select
               {...register('status', { required: true })}
               className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"

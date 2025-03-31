@@ -5,6 +5,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
+// GraphQL mutation for logging in
 const LOGIN = gql`
   mutation Login($email: String!, $password: String!) {
     login(email: $email, password: $password) {
@@ -15,15 +16,26 @@ const LOGIN = gql`
   }
 `;
 
+/**
+ * Login component for user authentication.
+ * @returns {JSX.Element} The rendered Login component.
+ */
 export default function Login() {
   const { register, handleSubmit, formState: { errors } } = useForm();
   const [serverError, setServerError] = useState<string | null>(null);
   const [login] = useMutation(LOGIN);
   const router = useRouter();
 
+  /**
+   * Handles form submission for login.
+   * @param {Object} formData - The form data containing email and password.
+   * @param {string} formData.email - The email of the user.
+   * @param {string} formData.password - The password of the user.
+   * @returns {Promise<void>} A promise that resolves when the login process is complete.
+   */
   const onSubmit = async (formData: any) => {
     try {
-      setServerError(null);
+      setServerError(null); // Reset server error state
       const { data } = await login({ variables: formData });
       
       if (data?.login) {
