@@ -1,0 +1,10 @@
+{
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+      "outDir": "./build",
+      "declaration": false,
+      "sourceMap": false
+    },
+    "include": ["server.ts", "models/**/*", "resolvers.ts"],
+    "exclude": ["node_modules", "tests/**/*"]
+  }
