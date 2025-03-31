@@ -12,6 +12,6 @@
       "node", // Keep node types if you need them 
     ]
   },
-  "include": ["server.ts", "models/**/*", "resolvers.ts"],
+  "include": ["server.ts", "models/**/*", "resolvers.ts", "declarations.d.ts"],
   "exclude": ["node_modules"]
 }
