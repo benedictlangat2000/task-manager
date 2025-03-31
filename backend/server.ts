@@ -1,4 +1,4 @@
-import express, { Request, Response, Application } from 'express';
+import express from 'express';
 import session from 'express-session';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
@@ -10,34 +10,27 @@ import dotenv from 'dotenv';
 
 dotenv.config(); // Load environment variables from .env file
 
-// Create an instance of the Express application
-const app: Application = express();
+const app = express();
 
-// Middleware to parse JSON requests and cookies
+// Middleware to parse JSON requests
 app.use(express.json());
 app.use(cookieParser());
 
-/**
- * Configures CORS to allow the frontend to access the backend API.
- * The allowed origin is taken from the environment variable FRONTEND_URL or defaults to http://localhost:3000.
- */
+// Configure CORS to allow the frontend and include credentials
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
-    credentials: true,
+    origin: process.env.FRONTEND_URL || 'http://localhost:3000', // explicitly allow this origin
+    credentials: true,               // allow credentials (cookies, headers, etc.)
   })
 );
 
-/**
- * Configures session management.
- * Uses a session secret from environment variables and sets cookies to secure in production.
- */
+// Configure session management
 app.use(
   session({
-    secret: process.env.SESSION_SECRET || 'default_secret_key', // Replace with a secure value in production
+    secret: process.env.SESSION_SECRET || 'default_secret_key', // use env variable for production
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: process.env.NODE_ENV === 'production' },
+    cookie: { secure: process.env.NODE_ENV === 'production' }  // set to true when using HTTPS
   })
 );
 
@@ -52,24 +45,23 @@ async function startServer(): Promise<void> {
   const server = new ApolloServer({
     typeDefs,
     resolvers,
-    context: ({ req, res }: { req: Request; res: Response }): { req: Request; res: Response } => ({ req, res }),
+    context: ({ req, res }) => ({ req, res }), // Pass request and response to context
   });
 
   await server.start();
-
+  
   // Disable Apollo's internal CORS handling since we handle it globally
-  server.applyMiddleware({ app: app as any, path: '/graphql', cors: false });
-
+  server.applyMiddleware({ app, path: '/graphql', cors: false });
 
   // Sync the Sequelize models with the database
   await sequelize.sync();
 
-  // Start the Express server on the specified port
+  // Start the Express server
   const PORT = process.env.PORT || 4000;
   app.listen(PORT, () =>
     console.log(`Server running on http://localhost:${PORT}/graphql`)
   );
 }
 
-// Start the server and handle any startup errors
-startServer().catch((error) => console.error('Server startup error:', error));
+// Start the server
+startServer();
