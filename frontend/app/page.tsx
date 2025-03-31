@@ -25,13 +25,6 @@ export default function LandingPage() {
                   </span>
                 </Link>
               </li>
-              <li>
-                <Link href="/signup">
-                  <span className="bg-green-500 hover:bg-gray-500 text-white font-semibold py-2 px-4 rounded transition-colors duration-200">
-                    Sign Up
-                  </span>
-                </Link>
-              </li>
             </ul>
           </nav>
         </div>

@@ -22,8 +22,14 @@ export default function Dashboard() {
   if (error) return <p className="text-center mt-8 text-red-500">Error: {error.message}</p>;
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
-      <div className="max-w-4xl mx-auto bg-white shadow rounded-lg p-6">
+    <div className="min-h-screen bg-gray-100">
+      {/* Top Bar */}
+      <div className="bg-blue-600 p-4">
+        <h1 className="text-white text-3xl font-bold text-center">TaskMaster</h1>
+      </div>
+
+      {/* Content Container with Margin Top */}
+      <div className="max-w-4xl mx-auto bg-white shadow rounded-lg p-6 mt-4">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold text-gray-800">Dashboard</h1>
           <Link

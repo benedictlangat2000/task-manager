@@ -7,8 +7,9 @@
     "rootDir": "./",
     "strict": true,
     "esModuleInterop": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "types": ["node", "jest"]
   },
-  "include": ["server.ts", "models/**/*", "resolvers.ts"],
+  "include": ["server.ts", "models/**/*", "resolvers.ts, tests/**/*"],
   "exclude": ["node_modules"]
 }

@@ -1,7 +1,7 @@
 'use client';
 import { useForm } from 'react-hook-form';
 import { gql, useMutation, useQuery } from '@apollo/client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 
 const GET_TASKS = gql`
@@ -39,9 +39,7 @@ const UPDATE_TASK = gql`
 
 const DELETE_TASK = gql`
   mutation DeleteTask($id: ID!) {
-    deleteTask(id: $id) {
-      id
-    }
+    deleteTask(id: $id)  # No subfields since it returns a Boolean
   }
 `;
 
@@ -52,19 +50,35 @@ export default function TaskManagement() {
   const [updateTask] = useMutation(UPDATE_TASK);
   const [deleteTask] = useMutation(DELETE_TASK);
   const [editingTask, setEditingTask] = useState<any>(null);
+  const [message, setMessage] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  // Effect to clear messages after 5 seconds
+  useEffect(() => {
+    if (message || errorMessage) {
+      const timer = setTimeout(() => {
+        setMessage(null);
+        setErrorMessage(null);
+      }, 5000);
+      return () => clearTimeout(timer); // Cleanup the timer on unmount or when message changes
+    }
+  }, [message, errorMessage]);
 
   const onSubmit = async (formData: any) => {
     try {
       if (editingTask) {
         await updateTask({ variables: { id: editingTask.id, ...formData } });
+        setMessage('Task updated successfully!');
         setEditingTask(null);
       } else {
         await createTask({ variables: formData });
+        setMessage('Task created successfully!');
       }
       reset();
       refetch();
     } catch (err) {
       console.error('Error:', err);
+      setErrorMessage('An error occurred while saving the task.');
     }
   };
 
@@ -75,10 +89,16 @@ export default function TaskManagement() {
 
   const handleDelete = async (id: number) => {
     try {
-      await deleteTask({ variables: { id } });
-      refetch();
+      const { data } = await deleteTask({ variables: { id: id.toString() } });
+      if (data.deleteTask) {
+        setMessage('Task deleted successfully!');
+        refetch();
+      } else {
+        setErrorMessage('Failed to delete task.');
+      }
     } catch (err) {
       console.error('Error deleting task:', err);
+      setErrorMessage('An error occurred while deleting the task.');
     }
   };
 
@@ -87,15 +107,22 @@ export default function TaskManagement() {
 
   return (
     <div className="max-w-4xl mx-auto p-6">
+      {/* Top Bar */}
+      <div className="bg-blue-600 p-4 mb-6">
+        <h1 className="text-white text-3xl font-bold text-center">TaskMaster</h1>
+      </div>
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-gray-800">Task Management</h1>
         <Link
           href="/dashboard"
-          className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200"
+          className="bg-green-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200"
         >
           Back to Dashboard
         </Link>
       </div>
+
+      {message && <p className="text-green-500">{message}</p>}
+      {errorMessage && <p className="text-red-500">{errorMessage}</p>}
 
       <form onSubmit={handleSubmit(onSubmit)} className="bg-white p-6 rounded-lg shadow-md mb-8">
         <div className="grid grid-cols-1 gap-4">
@@ -120,7 +147,7 @@ export default function TaskManagement() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb- 1">Status</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
             <select
               {...register('status', { required: true })}
               className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
@@ -134,7 +161,7 @@ export default function TaskManagement() {
 
           <button
             type="submit"
-            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200"
+            className="bg-blue-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200"
           >
             {editingTask ? 'Update Task' : 'Create Task'}
           </button>
@@ -156,25 +183,17 @@ export default function TaskManagement() {
               <tr key={task.id} className="hover:bg-gray-50 even:bg-gray-50">
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{task.title}</td>
                 <td className="px-6 py-4 whitespace-normal text-sm text-gray-600">{task.description}</td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                    task.status === 'completed' ? 'bg-green-100 text-green-800' :
-                    task.status === 'in-progress' ? 'bg-yellow-100 text-yellow-800' :
-                    'bg-gray-100 text-gray-800'
-                  }`}>
-                    {task.status}
-                  </span>
-                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{task.status}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                   <button
                     onClick={() => handleEdit(task)}
-                    className="text-blue-600 hover:text-blue-900 mr-4"
+                    className="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200 mr-4"
                   >
                     Edit
                   </button>
                   <button
                     onClick={() => handleDelete(task.id)}
-                    className="text-red-600 hover:text-red-900"
+                    className="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors duration-200"
                   >
                     Delete
                   </button>
