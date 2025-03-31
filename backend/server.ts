@@ -1,4 +1,3 @@
-// backend/server.ts
 import express from 'express';
 import session from 'express-session';
 import cookieParser from 'cookie-parser';
@@ -7,6 +6,9 @@ import { ApolloServer } from 'apollo-server-express';
 import { typeDefs } from './schema';
 import { resolvers } from './resolvers';
 import { sequelize } from './models';
+import dotenv from 'dotenv';
+
+dotenv.config(); // Load environment variables from .env file
 
 const app = express();
 
@@ -14,10 +16,10 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 
-// Configure CORS to allow the frontend at http://localhost:3000 and include credentials
+// Configure CORS to allow the frontend and include credentials
 app.use(
   cors({
-    origin: 'http://localhost:3000', // explicitly allow this origin
+    origin: process.env.FRONTEND_URL || 'http://localhost:3000', // explicitly allow this origin
     credentials: true,               // allow credentials (cookies, headers, etc.)
   })
 );
@@ -25,10 +27,10 @@ app.use(
 // Configure session management
 app.use(
   session({
-    secret: 'your_secret_key', // change to an env variable in production
+    secret: process.env.SESSION_SECRET || 'default_secret_key', // use env variable for production
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: false }  // set to true when using HTTPS
+    cookie: { secure: process.env.NODE_ENV === 'production' }  // set to true when using HTTPS
   })
 );
 
@@ -55,8 +57,9 @@ async function startServer() {
   await sequelize.sync();
 
   // Start the Express server
-  app.listen(4000, () =>
-    console.log('Server running on http://localhost:4000/graphql')
+  const PORT = process.env.PORT || 4000;
+  app.listen(PORT, () =>
+    console.log(`Server running on http://localhost:${PORT}/graphql`)
   );
 }
 
